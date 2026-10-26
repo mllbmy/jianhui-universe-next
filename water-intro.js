@@ -2,11 +2,11 @@ import * as THREE from './assets/vendor/three.module.min.js';
 
 // A separate, persistent underwater scene. The universe is revealed only on entry.
 export function createWaterIntro(renderer){
- const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.1,100);
+ const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.1,240);
  camera.position.z=28;
  const state={exit:0,age:0},point=new THREE.Vector2(),target=new THREE.Vector2();let energy=0,lastTime=0,lastX=0,lastY=0,imageReady=false,disposed=false;
  const placeholder=new THREE.DataTexture(new Uint8Array([3,14,26,255]),1,1);placeholder.needsUpdate=true;
- const uniforms={uTime:{value:0},uLayer:{value:0},uLayerStrength:{value:1},uOverscan:{value:1.55},uAspect:{value:innerWidth/innerHeight},uOpacity:{value:1},uPointer:{value:point},uEnergy:{value:0},uScale:{value:innerHeight*renderer.getPixelRatio()},uImage:{value:placeholder},uImageAspect:{value:16/9},uReady:{value:0}};
+ const uniforms={uTime:{value:0},uLayer:{value:0},uLayerStrength:{value:1},uOverscan:{value:4.2},uAspect:{value:innerWidth/innerHeight},uOpacity:{value:1},uPointer:{value:point},uEnergy:{value:0},uScale:{value:innerHeight*renderer.getPixelRatio()},uImage:{value:placeholder},uImageAspect:{value:16/9},uReady:{value:0}};
  // Reuse the already fetched responsive poster instead of downloading the same image again.
  const poster=document.querySelector('#entry-image');
  const usePoster=()=>{if(disposed||imageReady||!poster?.naturalWidth)return;poster.width=poster.naturalWidth;poster.height=poster.naturalHeight;const texture=new THREE.Texture(poster);texture.needsUpdate=true;texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());uniforms.uImageAspect.value=poster.naturalWidth/poster.naturalHeight;uniforms.uImage.value=texture;imageReady=true;};
@@ -46,13 +46,16 @@ export function createWaterIntro(renderer){
  float flowingVeil=curtain*.96*smoothstep(.01,.16,imageUv.y)*(1.-smoothstep(.86,1.,imageUv.y));
  picture=mix(picture,travelling,flowingVeil);
  picture*=.98+.02*sin(uTime*.36+imageUv.y*4.);
- color=mix(color,picture,uReady);
- float layerAlpha=1.;
- if(uLayer>.5){float luminance=dot(picture,vec3(.2126,.7152,.0722));float key=smoothstep(.09,.65,luminance);layerAlpha=key*curtain*.65*uLayerStrength*uReady;color=picture;}
+ float imageBounds=smoothstep(-.025,.065,imageUv.x)*(1.-smoothstep(.935,1.025,imageUv.x))*smoothstep(-.025,.065,imageUv.y)*(1.-smoothstep(.935,1.025,imageUv.y));
+ color=picture;
+ float layerAlpha=imageBounds;
+ if(uLayer>.5){float luminance=dot(picture,vec3(.2126,.7152,.0722));float key=smoothstep(.09,.65,luminance);layerAlpha=key*curtain*.65*uLayerStrength*uReady*imageBounds;color=picture;}
  gl_FragColor=vec4(color,uOpacity*layerAlpha);
  #include <colorspace_fragment>
  }
  `}));background.frustumCulled=false;background.renderOrder=-100;background.position.z=-8;scene.add(background);
+ // An unbounded water atmosphere keeps oblique views free of card edges.
+ const atmosphere=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({uniforms,depthTest:false,depthWrite:false,vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,.9999,1.);}`,fragmentShader:`varying vec2 vUv;uniform float uTime,uOpacity;void main(){vec2 p=vUv;float t=uTime*.12;float light=exp(-pow((p.x-.25)/(.4+(1.-p.y)*.3),2.))*pow(p.y,1.8);float haze=.5+.5*sin(p.x*3.+p.y*4.+t);vec3 c=vec3(.003,.017,.032)+vec3(.015,.065,.10)*light+vec3(.001,.006,.012)*haze;gl_FragColor=vec4(c,uOpacity);}`}));atmosphere.frustumCulled=false;atmosphere.renderOrder=-110;scene.add(atmosphere);
  // Parallel image cards at two depths, with point sprites in front: a 2.5D stage.
  const veilMaterial=background.material.clone();veilMaterial.uniforms={...uniforms,uLayer:{value:1}};
  const veil=new THREE.Mesh(background.geometry,veilMaterial);veil.position.z=1;veil.renderOrder=-90;veil.frustumCulled=false;scene.add(veil);
@@ -72,15 +75,16 @@ export function createWaterIntro(renderer){
  vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp(aSize*uScale*1.25/max(1.,-mv.z),.65,aType>1.5?100.:9.);
  vAlpha=(aType>1.5?.15:aType>.5?.35:.72)*smoothstep(-18.,-13.,wrap)*(1.-smoothstep(13.,18.,wrap));vLight=.6+.4*sin(aSeed*91.+t*.4);vType=aType;}
  `,fragmentShader:`uniform float uOpacity;varying float vAlpha,vType,vLight;void main(){float r=length(gl_PointCoord-.5)*2.;if(r>1.)discard;float alpha;vec3 color;if(vType>1.5){alpha=exp(-r*r*4.)*(1.-smoothstep(.5,1.,r));color=vec3(.28,.65,.92);}else{alpha=exp(-r*r*16.)+pow(1.-r,3.)*.28;color=mix(vec3(.25,.58,.85),vec3(.80,.94,1.),vLight);}gl_FragColor=vec4(color,alpha*vAlpha*uOpacity);}`}));particles.frustumCulled=false;scene.add(particles);
- return {scene,camera,state,complete(){state.age=Math.max(state.age,3.2);},resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();uniforms.uAspect.value=camera.aspect;uniforms.uScale.value=innerHeight*renderer.getPixelRatio();fitCards();},update(time,pointer,reduced){
-  const dt=lastTime===0?0:Math.min(.06,Math.max(0,time-lastTime));lastTime=time;if(reduced)state.age=3.2;else if(imageReady)state.age+=dt;target.set(pointer.x*23.2*camera.aspect,pointer.y*23.2);const speed=Math.hypot(pointer.x-lastX,pointer.y-lastY);lastX=pointer.x;lastY=pointer.y;const wanted=reduced?0:Math.min(1,speed*85);energy+=(wanted-energy)*(1-Math.exp(-Math.max(dt,.016)*4));point.lerp(target,.065);uniforms.uTime.value=reduced?0:state.age;uniforms.uEnergy.value=energy;uniforms.uOpacity.value=1-state.exit;if(imageReady)uniforms.uReady.value=1;
-  const progress=Math.min(1,state.age/3.2),e=progress*progress*progress*(progress*(progress*6.-15.)+10.),remaining=1-e;
-  const span=Math.min(1,Math.max(.5,camera.aspect/1.55));
-  const targetX=-4*span*remaining,targetY=.4*remaining;
-  camera.position.set(-10.5*span*remaining+(reduced?0:pointer.x*.3*e),1.6*remaining+(reduced?0:pointer.y*.2*e),28-5.5*remaining-state.exit*8);
-  camera.lookAt(targetX,targetY,0);camera.updateMatrixWorld();
+ return {scene,camera,state,complete(){state.age=Math.max(state.age,4.1);},resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();uniforms.uAspect.value=camera.aspect;uniforms.uScale.value=innerHeight*renderer.getPixelRatio();fitCards();},update(time,pointer,reduced){
+  const dt=lastTime===0?0:Math.min(.06,Math.max(0,time-lastTime));lastTime=time;if(reduced)state.age=4.1;else if(imageReady)state.age+=dt;target.set(pointer.x*23.2*camera.aspect,pointer.y*23.2);const speed=Math.hypot(pointer.x-lastX,pointer.y-lastY);lastX=pointer.x;lastY=pointer.y;const wanted=reduced?0:Math.min(1,speed*85);energy+=(wanted-energy)*(1-Math.exp(-Math.max(dt,.016)*4));point.lerp(target,.065);uniforms.uTime.value=reduced?0:state.age;uniforms.uEnergy.value=energy;uniforms.uOpacity.value=1-state.exit;if(imageReady)uniforms.uReady.value=1;
+  const progress=Math.min(1,state.age/4.1),e=progress*progress*progress*(progress*(progress*6.-15.)+10.),remaining=1-e;
+  const span=Math.min(1,Math.max(.65,camera.aspect/1.55));
+  const arc=Math.sin(Math.PI*e);
+  const targetX=-4*span*remaining,targetY=1.1*remaining;
+  camera.position.set((-60*remaining-8*arc)*span+(reduced?0:pointer.x*.55*e),7*remaining+2*arc+(reduced?0:pointer.y*.35*e),28+8*remaining+8*arc-state.exit*8);
+  camera.lookAt(targetX,targetY,0);camera.rotateZ(-.28*remaining-.1*arc);camera.updateMatrixWorld();
   uniforms.uLayerStrength.value=1-e;veil.visible=imageReady&&!reduced&&progress<1;
   farProbe.set(0,0,background.position.z).project(camera);midProbe.set(0,0,veil.position.z).project(camera);
   Object.assign(cameraStage,{progress,yaw:Math.atan2(camera.position.x-targetX,camera.position.z)*180/Math.PI,farX:farProbe.x,midX:midProbe.x});
- },info(){return {variant:"2.5d",particles:count,sourceImage:true,restored:true,age:state.age,arrival:cameraStage.progress,labelReady:cameraStage.progress>=.72,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z,yaw:cameraStage.yaw},layers:[{depth:background.position.z,screenX:cameraStage.farX},{depth:veil.position.z,screenX:cameraStage.midX},{depth:12}],interaction:energy,exit:state.exit,imageReady};},dispose(){disposed=true;uniforms.uImage.value.dispose();if(uniforms.uImage.value!==placeholder)placeholder.dispose();geometry.dispose();particles.material.dispose();background.geometry.dispose();background.material.dispose();veil.material.dispose();}};
+ },info(){return {variant:"2.5d",particles:count,sourceImage:true,restored:true,age:state.age,arrival:cameraStage.progress,labelReady:cameraStage.progress>=.72,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z,yaw:cameraStage.yaw,roll:camera.rotation.z*180/Math.PI},layers:[{depth:background.position.z,screenX:cameraStage.farX},{depth:veil.position.z,screenX:cameraStage.midX},{depth:12}],interaction:energy,exit:state.exit,imageReady};},dispose(){disposed=true;uniforms.uImage.value.dispose();if(uniforms.uImage.value!==placeholder)placeholder.dispose();geometry.dispose();particles.material.dispose();background.geometry.dispose();background.material.dispose();veil.material.dispose();atmosphere.geometry.dispose();atmosphere.material.dispose();}};
 }
