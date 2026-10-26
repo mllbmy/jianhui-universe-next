@@ -14,3 +14,5 @@
 @media(max-width:700px){#boot-status{bottom:7%;font-size:10px}#skip-formation{bottom:2%;right:18px;font-size:10px}.launch-copy{bottom:11%}.launch-copy h2{font-size:49px}.is-opening .launch:before{inset:45% 0 0}}
 @media(orientation:landscape) and (max-height:550px){#boot-status{bottom:5%}#skip-formation{bottom:4%}.launch-copy{bottom:auto}}
 @media(prefers-reduced-motion:reduce){.is-opening .launch-copy{transition:none;filter:none}#boot-status:before{animation:none}}
+
+.is-detail .planet-caption{visibility:hidden}
