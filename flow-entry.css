@@ -2,8 +2,8 @@
 #cosmos{background:radial-gradient(ellipse at 30% -12%,#0c354b 0,#051522 38%,#020b16 78%)}
 #cosmos canvas{position:relative}
 .is-opening .masthead,.is-opening #experience,.is-opening .flightbar,.is-opening .planet-caption,.is-opening #world-labels{visibility:hidden!important}
-.is-opening .launch-copy{opacity:0;visibility:hidden;filter:blur(7px);transition:opacity 1.3s ease,filter 1.5s ease,visibility 0s 1.3s}
-.is-opening.flow-arrived .launch-copy{opacity:1;visibility:visible;filter:blur(0);transition:opacity 1.3s ease,filter 1.5s ease,visibility 0s}
+.is-opening .launch-copy{opacity:0;visibility:hidden;filter:none;transition:opacity .85s ease,visibility 0s .85s}
+.is-opening.flow-arrived .launch-copy{opacity:1;visibility:visible;filter:none;transition:opacity .85s ease,visibility 0s}
 .launch-copy h2{margin:22px 0 20px}
 #boot-status{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);font:11px Manrope,CosmicText,sans-serif;letter-spacing:.13em;color:#bddded;text-align:center;white-space:nowrap}
 #boot-status:before{content:"";display:block;width:48px;height:1px;margin:0 auto 17px;background:#acdfff80;transform-origin:left;animation:light-breath 2.4s ease-in-out infinite}
