@@ -1,0 +1,101 @@
+[
+  {
+    "id": "mati-national-silver",
+    "title": "2026年第八届码蹄杯程序设计大赛",
+    "award": "职业院校赛道国赛银奖",
+    "category": "competition",
+    "image": "assets/certificates/mati-national-silver.jpg",
+    "width": 904,
+    "height": 1280,
+    "context": "个人限时算法竞赛，以在线评测检验代码。",
+    "experience": "实践问题拆解、Python 编程和限时调试。"
+  },
+  {
+    "id": "mati-regional-gold",
+    "title": "2026年第八届码蹄杯程序设计大赛",
+    "award": "职业院校赛道华南及港澳台赛区省赛金奖",
+    "category": "competition",
+    "image": "assets/certificates/mati-regional-gold.jpg",
+    "width": 904,
+    "height": 1280,
+    "context": "码蹄杯省赛阶段的算法与程序设计考验。",
+    "experience": "结合题型整理与评测反馈，持续改进解题过程。"
+  },
+  {
+    "id": "outsourcing-national-third",
+    "title": "第十七届中国大学生服务外包创新创业大赛",
+    "award": "全国赛企业命题类三等奖",
+    "category": "competition",
+    "image": "assets/certificates/outsourcing-national-third.jpg",
+    "width": 1600,
+    "height": 1131,
+    "context": "围绕企业命题，构建职业规划智能体。",
+    "experience": "独立完成网站开发，初赛获小组第一名。"
+  },
+  {
+    "id": "challenge-cup-bronze",
+    "title": "第十五届“挑战杯”广东大学生创业计划竞赛",
+    "award": "铜奖",
+    "category": "competition",
+    "image": "assets/certificates/challenge-cup-bronze.jpg",
+    "width": 1600,
+    "height": 1103,
+    "context": "大学生创业计划竞赛，围绕创新创业项目展开。",
+    "experience": "参赛项目获广东省铜奖，记录应用创新实践。"
+  },
+  {
+    "id": "soundlane-mobile-first",
+    "title": "2026中国高校计算机大赛移动应用创新赛",
+    "award": "启明赛道（高教组）华南赛区一等奖",
+    "category": "competition",
+    "image": "assets/certificates/soundlane-mobile-first.jpg",
+    "width": 1131,
+    "height": 1600,
+    "context": "面向视障出行场景设计移动应用作品。",
+    "experience": "独立推进需求、交互、AI 辅助开发、测试与答辩。"
+  },
+  {
+    "id": "robot-vision-third",
+    "title": "2026年广东省大学生计算机设计大赛",
+    "award": "智能机器人视觉系统挑战赛三等奖",
+    "category": "competition",
+    "image": "assets/certificates/robot-vision-third.jpg",
+    "width": 1600,
+    "height": 1132,
+    "context": "围绕机器人视觉识别与现场联调开展挑战。",
+    "experience": "担任队长，参与补充光照样本与标定参数调整。"
+  },
+  {
+    "id": "huawei-hcia-ai",
+    "title": "华为 HCIA-AI",
+    "award": "HCIA-AI 认证",
+    "category": "certification",
+    "image": "assets/certificates/huawei-hcia-ai.jpg",
+    "width": 1600,
+    "height": 1131,
+    "context": "AI 方向的专业认证学习与考核。",
+    "experience": "补充人工智能基础知识，支持后续应用实践。"
+  },
+  {
+    "id": "china-us-maker",
+    "title": "2026中美青年创客大赛",
+    "award": "深圳分赛区（职业院校赛道）选拔赛优秀奖",
+    "category": "competition",
+    "image": "assets/certificates/china-us-maker.jpg",
+    "width": 1109,
+    "height": 1600,
+    "context": "面向青年创客的创新作品选拔。",
+    "experience": "获深圳分赛区职业院校赛道选拔赛优秀奖。"
+  },
+  {
+    "id": "lions-innovation",
+    "title": "“深圳狮子会杯”粤港澳大湾区职业院校创新创业校际邀请赛",
+    "award": "优秀奖",
+    "category": "competition",
+    "image": "assets/certificates/lions-innovation.jpg",
+    "width": 1126,
+    "height": 1600,
+    "context": "粤港澳大湾区职业院校创新创业校际交流。",
+    "experience": "在校际邀请赛中获得优秀奖。"
+  }
+]
